@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Backend uploads (user data)
+backend/uploads/*.nc
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test / temp files
+test_plot_body.json
+
+# Cache
+.cache/
