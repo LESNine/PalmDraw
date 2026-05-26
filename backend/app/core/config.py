@@ -7,7 +7,7 @@ class Settings:
     APP_VERSION: str = "0.1.0"
     HOST: str = "0.0.0.0"
     PORT: int = 8000
-    CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:3000"]
+    CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:3000", "http://localhost:8000"]
     UPLOAD_DIR: Path = Path("./uploads")
     MAX_CACHE_SIZE_MB: int = 2048
     PLOT_DPI: int = 150
