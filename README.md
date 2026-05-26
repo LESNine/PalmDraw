@@ -32,7 +32,7 @@ A visualization WebUI tool designed for PALM large-eddy simulation output files.
 ### Installation
 
 ```bash
-git clone https://github.com/<your-username>/palmdraw.git
+git clone https://github.com/LESNine/palmdraw.git
 cd palmdraw
 
 # Install backend dependencies
@@ -66,16 +66,102 @@ npm run dev
 
 Visit http://localhost:5173 to use the application.
 
-### Production Deployment
+## Server Deployment (Ubuntu + Conda)
+
+### 1. Clone & setup environment
 
 ```bash
-# Build frontend
-cd frontend
-npm run build
+cd ~
+git clone https://github.com/LESNine/palmdraw.git
+cd palmdraw
 
-# Start backend (FastAPI serves frontend static files)
-cd ../backend
+conda create -n palmdraw python=3.12 -y
+conda activate palmdraw
+pip install -r backend/requirements.txt
+```
+
+### 2. Build frontend
+
+```bash
+conda install -n palmdraw nodejs=20 -y
+cd frontend
+npm install
+npm run build
+cd ..
+```
+
+### 3. Test run
+
+```bash
+conda activate palmdraw
+cd backend
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+Visit `http://<server-ip>:8000` to verify, then `Ctrl+C` to stop.
+
+### 4. Run as systemd service (persistent)
+
+Find the Python path:
+
+```bash
+conda activate palmdraw
+which python
+```
+
+Create service file:
+
+```bash
+sudo nano /etc/systemd/system/palmdraw.service
+```
+
+Write the following (replace `<username>` and the Python path):
+
+```ini
+[Unit]
+Description=palmdraw backend
+After=network.target
+
+[Service]
+Type=simple
+User=<username>
+WorkingDirectory=/home/<username>/palmdraw/backend
+ExecStart=/home/<username>/miniconda3/envs/palmdraw/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Start the service:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable palmdraw
+sudo systemctl start palmdraw
+sudo systemctl status palmdraw
+```
+
+### 5. Open firewall
+
+```bash
+sudo ufw allow 8000
+```
+
+If using a cloud provider (Alibaba Cloud, Tencent Cloud, etc.), also open port 8000 in the security group.
+
+### Update code
+
+```bash
+cd ~/palmdraw
+git pull
+
+# If frontend changed:
+cd frontend && npm run build && cd ..
+
+# If backend changed:
+sudo systemctl restart palmdraw
 ```
 
 ## Project Structure
@@ -155,7 +241,7 @@ MIT
 ### 安装
 
 ```bash
-git clone https://github.com/<your-username>/palmdraw.git
+git clone https://github.com/LESNine/palmdraw.git
 cd palmdraw
 
 # 安装后端依赖
@@ -189,16 +275,102 @@ npm run dev
 
 访问 http://localhost:5173 即可使用。
 
-### 生产部署
+## 服务器部署（Ubuntu + Conda）
+
+### 1. 克隆仓库 & 创建环境
 
 ```bash
-# 构建前端
-cd frontend
-npm run build
+cd ~
+git clone https://github.com/LESNine/palmdraw.git
+cd palmdraw
 
-# 启动后端（前端静态文件由 FastAPI 托管）
-cd ../backend
+conda create -n palmdraw python=3.12 -y
+conda activate palmdraw
+pip install -r backend/requirements.txt
+```
+
+### 2. 构建前端
+
+```bash
+conda install -n palmdraw nodejs=20 -y
+cd frontend
+npm install
+npm run build
+cd ..
+```
+
+### 3. 测试运行
+
+```bash
+conda activate palmdraw
+cd backend
 python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+浏览器访问 `http://服务器IP:8000` 验证，确认后 `Ctrl+C` 停止。
+
+### 4. 配置 systemd 服务（持久运行）
+
+查找 Python 路径：
+
+```bash
+conda activate palmdraw
+which python
+```
+
+创建服务文件：
+
+```bash
+sudo nano /etc/systemd/system/palmdraw.service
+```
+
+写入以下内容（替换 `<用户名>` 和 Python 路径）：
+
+```ini
+[Unit]
+Description=palmdraw backend
+After=network.target
+
+[Service]
+Type=simple
+User=<用户名>
+WorkingDirectory=/home/<用户名>/palmdraw/backend
+ExecStart=/home/<用户名>/miniconda3/envs/palmdraw/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+启动服务：
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable palmdraw
+sudo systemctl start palmdraw
+sudo systemctl status palmdraw
+```
+
+### 5. 开放防火墙端口
+
+```bash
+sudo ufw allow 8000
+```
+
+如果使用云服务器（阿里云、腾讯云等），还需要在安全组中放行 8000 端口。
+
+### 更新代码
+
+```bash
+cd ~/palmdraw
+git pull
+
+# 如果前端有改动：
+cd frontend && npm run build && cd ..
+
+# 如果后端有改动：
+sudo systemctl restart palmdraw
 ```
 
 ## 项目结构
