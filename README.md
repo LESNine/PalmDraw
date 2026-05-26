@@ -95,12 +95,31 @@ cd ..
 ```bash
 conda activate palmdraw
 cd backend
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-Visit `http://<server-ip>:8000` to verify, then `Ctrl+C` to stop.
+### 4. Access the application
 
-### 4. Run as systemd service (persistent)
+**Option A: SSH tunnel (recommended, no firewall needed)**
+
+```bash
+# On your local machine, connect with port forwarding:
+ssh -L 8000:localhost:8000 <username>@<server-ip>
+```
+
+Then visit **http://localhost:8000** in your browser. The backend only listens on `127.0.0.1`, so no external access is exposed.
+
+**Option B: Direct access (requires open port)**
+
+If you need direct access from other machines, start with `--host 0.0.0.0` and open the firewall:
+
+```bash
+sudo ufw allow 8000
+```
+
+If using a cloud provider (Alibaba Cloud, Tencent Cloud, etc.), also open port 8000 in the security group. Then visit `http://<server-ip>:8000`.
+
+### 5. Run as systemd service (persistent)
 
 Find the Python path:
 
@@ -126,13 +145,15 @@ After=network.target
 Type=simple
 User=<username>
 WorkingDirectory=/home/<username>/palmdraw/backend
-ExecStart=/home/<username>/miniconda3/envs/palmdraw/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+ExecStart=/home/<username>/miniconda3/envs/palmdraw/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 Restart=always
 RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
 ```
+
+> Use `--host 0.0.0.0` instead of `127.0.0.1` if you need direct external access (Option B).
 
 Start the service:
 
@@ -142,14 +163,6 @@ sudo systemctl enable palmdraw
 sudo systemctl start palmdraw
 sudo systemctl status palmdraw
 ```
-
-### 5. Open firewall
-
-```bash
-sudo ufw allow 8000
-```
-
-If using a cloud provider (Alibaba Cloud, Tencent Cloud, etc.), also open port 8000 in the security group.
 
 ### Update code
 
@@ -304,12 +317,31 @@ cd ..
 ```bash
 conda activate palmdraw
 cd backend
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-浏览器访问 `http://服务器IP:8000` 验证，确认后 `Ctrl+C` 停止。
+### 4. 访问方式
 
-### 4. 配置 systemd 服务（持久运行）
+**方式 A：SSH 隧道（推荐，无需开放端口）**
+
+```bash
+# 在本地机器上，使用端口转发连接：
+ssh -L 8000:localhost:8000 <用户名>@<服务器IP>
+```
+
+然后在浏览器打开 **http://localhost:8000** 即可使用。后端仅监听 `127.0.0.1`，不暴露外部访问，更安全。
+
+**方式 B：直接访问（需要开放端口）**
+
+如果需要其他机器直接访问，启动时使用 `--host 0.0.0.0` 并开放防火墙：
+
+```bash
+sudo ufw allow 8000
+```
+
+如果使用云服务器（阿里云、腾讯云等），还需要在安全组中放行 8000 端口。然后通过 `http://服务器IP:8000` 访问。
+
+### 5. 配置 systemd 服务（持久运行）
 
 查找 Python 路径：
 
@@ -335,13 +367,15 @@ After=network.target
 Type=simple
 User=<用户名>
 WorkingDirectory=/home/<用户名>/palmdraw/backend
-ExecStart=/home/<用户名>/miniconda3/envs/palmdraw/bin/python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+ExecStart=/home/<用户名>/miniconda3/envs/palmdraw/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 Restart=always
 RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
 ```
+
+> 如需外部直接访问（方式 B），将 `127.0.0.1` 改为 `0.0.0.0`。
 
 启动服务：
 
@@ -351,14 +385,6 @@ sudo systemctl enable palmdraw
 sudo systemctl start palmdraw
 sudo systemctl status palmdraw
 ```
-
-### 5. 开放防火墙端口
-
-```bash
-sudo ufw allow 8000
-```
-
-如果使用云服务器（阿里云、腾讯云等），还需要在安全组中放行 8000 端口。
 
 ### 更新代码
 
